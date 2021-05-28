@@ -10,7 +10,6 @@ choice_raw = [];
 
 % load data
 [data,~] = LoadAllSubjectData(subjectID,expt_type,datadir);
-disp('Data for the subject loaded!');
 frames = data.number_of_images;
 
 accuracy = [];
@@ -43,4 +42,6 @@ data_sub.frame_categories = signal_all;
 data_sub.choice = choice_raw;
 data_sub.num_trials = trials;
 data_sub.accuracy = accuracy; 
+disp('Data for the subject loaded!');
+
 end
