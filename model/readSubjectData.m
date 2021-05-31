@@ -1,7 +1,7 @@
 function data_sub = readSubjectData(subjectID)
 expt_type = 3;
 [ParentFolderPath] = fileparts(pwd);
-datadir = fullfile(ParentFolderPath, '/RawData');
+datadir = fullfile(ParentFolderPath, '../../../../RawData');
 
 signal_chosen_raw_actual = [];
 signal_not_chosen_raw_actual = [];

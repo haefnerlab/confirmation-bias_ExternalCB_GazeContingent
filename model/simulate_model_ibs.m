@@ -13,11 +13,6 @@ params=[100,theta(1),theta(2),theta(3),p_match,0,0.5,0,0.5];
 
 %%
 
-num_peri = 2;
-frames = 4;
-
-
-
 
 frame_categories=design_matrix;
 frame_signals=frame_categories+normrnd(0,orientation_std_exp,size(frame_categories));
