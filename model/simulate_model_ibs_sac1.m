@@ -1,4 +1,4 @@
-function resp=simulate_model_ibs(theta,design_matrix)
+function resp=simulate_model_ibs_sac1(theta,design_matrix)
 
 
 
@@ -20,9 +20,9 @@ frame_signals=frame_signals*scale_normalize;
 
 
 
-[chosen_locs,not_chosen_locs,final_choice,lo]=simulate_model_v3(frame_signals,params,scale_normalize,is_sampling,orientation_std_exp);
+[chosen_locs,not_chosen_locs,final_choice,lo]=simulate_model(frame_signals,params,scale_normalize,is_sampling,orientation_std_exp);
 
-resp=bin2dec(num2str([chosen_locs==1,final_choice==1]));
+resp=[chosen_locs(:,1)];
 
 end
 
