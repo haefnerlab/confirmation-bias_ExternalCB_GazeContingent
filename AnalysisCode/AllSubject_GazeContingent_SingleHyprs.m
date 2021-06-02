@@ -29,8 +29,7 @@ subjects = ...
 
 disp('Starting search of best hyper parameters across all subjects...');
 [num_sub,~] = size(subjects);
-% [best_hprs] = CustomRegression.combined_cross_validation_hprs(subjects, expt_type, hpr_ridge, hpr_ar1, hpr_curvature, standardize, folds);
-best_hprs = [0.2955         0    0.4437];
+[best_hprs] = CustomRegression.combined_cross_validation_hprs(subjects, expt_type, hpr_ridge, hpr_ar1, hpr_curvature, standardize, folds);
 
 fx = @(mu,nt) normcdf(abs(mu-0.5)./sqrt((mu*(1-mu))/nt),'upper');
 
@@ -161,7 +160,7 @@ for sub=1:num_sub
     %     pause;
     sgtitle(['Analysis for Subject ' num2str(sub)],'fontsize',30);
 end
-
+%%
 if mod(num_sub,2)==0
     sb_plt = num_sub/2;
     md_x = floor(sb_plt/2);
@@ -170,13 +169,13 @@ else
     md_x = floor(sb_plt/2) + 1;
 end
 authors = [2 3];
-chosen_sub = [];
+notbiased_sub = [];
 for i=1:num_sub
     if stars{i}==' '
-        chosen_sub(end+1) = i;
+        notbiased_sub(end+1) = i;
     end
 end
-    
+biased_sub = setdiff(linspace(1,num_sub,num_sub),notbiased_sub);   
 %%
 fig2 = figure();
 set(fig2,'defaultLegendAutoUpdate','off');
@@ -252,7 +251,7 @@ for i=1:(num_sub)
     end
     hold on;
     xlim([1 frames + 1]);
-    text(2,2,[num2str(trials_per_num_peri(i)) ' trials'],'fontsize',15);
+%     text(2,2,[num2str(trials_per_num_peri(i)) ' trials'],'fontsize',15);
     yline(0,'k','linewidth',2);
     ylim([-2 5]);
     xticks([1 2 3 4]);
@@ -298,6 +297,13 @@ sgtitle('Subjectwise performance and bias','fontsize',30);
 %%
 for pp=2:length(points)
     figure();
+    set(gcf, 'renderer', 'painters');
+    set(gcf, 'PaperUnits', 'inches');
+    set(gcf, 'PaperSize', [4 2]);
+    set(gcf, 'PaperPositionMode', 'manual');
+    set(gcf, 'PaperPosition', [0 0 4 2]);
+    set(gca, 'Position', get(gca, 'OuterPosition') - ...
+    get(gca, 'TightInset') * [-1 0 1 0; 0 -1 0 1; 0 0 1 0; 0 0 0 1]);
     for i=1:(num_sub)
         s=subplot(2,sb_plt,i);
         errorbar(squeeze(belief_mid_opp{pp}(i,:)),squeeze(prob_chose_in_favor_opp{pp}(i,:)),squeeze(lo_err_opp{pp}(i,:)),squeeze(hi_err_opp{pp}(i,:)),'-bo','LineWidth',2);
@@ -311,10 +317,10 @@ for pp=2:length(points)
             xlabel('Accumulated evidence','fontsize',30);
         end
         yline(0.5,'k','LineWidth',2);
-        xticks(round(squeeze(belief_mid_opp{pp}(i,:)),2));
+        xticks(round(squeeze(belief_mid_opp{pp}(i,:)),1));
         xlim([min(belief_mid_opp{pp}(i,:))-0.01 max(squeeze(belief_mid_opp{pp}(i,:)))+0.01]);
-        ylim([0.0 1.0]);
-        text(belief_mid_opp{pp}(i,1)+0.1,0.2,['Opp. Sacc: ' num2str(floor(mean(sub_opp_sacc(i))))],'fontsize',15);
+        ylim([0.3 1.0]);
+%         text(belief_mid_opp{pp}(i,1)+0.1,0.2,['Opp. Sacc: ' num2str(floor(mean(sub_opp_sacc(i))))],'fontsize',15);
         ax = gca;
         set(ax, 'box','off');
         ax.LineWidth=2;
@@ -472,7 +478,7 @@ for sub=1:num_sub
         LH6(1) = bar(k1, squeeze(sub_accuracy_first_half(sub)),'FaceColor',[0.9290 0.6940 0.1250],'EdgeColor','k','LineWidth',0.5);
         L6{1} = 'First half';
     else
-        if sum(sub==chosen_sub)==1
+        if sum(sub==notbiased_sub)==1
             bar(k1, squeeze(sub_accuracy_first_half(sub)),'FaceColor',[0.9290 0.6940 0.1250],'EdgeColor','k','LineWidth',3);
         elseif sum(sub==authors)==1
             bar(k1, squeeze(sub_accuracy_first_half(sub)),'FaceColor',[0.9290 0.6940 0.1250],'EdgeColor',[0.6350 0.0780 0.1840],'LineWidth',3);
@@ -485,7 +491,7 @@ for sub=1:num_sub
         LH6(2) = bar(k2, sub_accuracy_second_half(sub),'FaceColor',[0.8500 0.3250 0.0980],'EdgeColor','k','LineWidth',0.5);
         L6{2} = 'Second half';
     else
-        if sum(sub==chosen_sub)==1
+        if sum(sub==notbiased_sub)==1
             bar(k2, sub_accuracy_second_half(sub),'FaceColor',[0.8500 0.3250 0.0980],'EdgeColor','k','LineWidth',3);
         elseif sum(sub==authors)==1
             bar(k2, sub_accuracy_second_half(sub),'FaceColor',[0.8500 0.3250 0.0980],'EdgeColor',[0.6350 0.0780 0.1840],'LineWidth',3);
@@ -525,7 +531,7 @@ for sub=1:num_sub
         LH6(1) = bar(k1, squeeze(prob_chose_in_favor_opp_first_half(sub)),'FaceColor',[0.9290 0.6940 0.1250],'EdgeColor','k','LineWidth',0.5);
         L6{1} = 'First half';
     else
-        if sum(sub==chosen_sub)==1
+        if sum(sub==notbiased_sub)==1
             bar(k1, squeeze(prob_chose_in_favor_opp_first_half(sub)),'FaceColor',[0.9290 0.6940 0.1250],'EdgeColor','k','LineWidth',3);
         elseif sum(sub==authors)==1
             bar(k1, squeeze(prob_chose_in_favor_opp_first_half(sub)),'FaceColor',[0.9290 0.6940 0.1250],'EdgeColor',[0.6350 0.0780 0.1840],'LineWidth',3);
@@ -538,7 +544,7 @@ for sub=1:num_sub
         LH6(2) = bar(k2, prob_chose_in_favor_opp_second_half(sub),'FaceColor',[0.8500 0.3250 0.0980],'EdgeColor','k','LineWidth',0.5);
         L6{2} = 'Second half';
     else
-        if sum(sub==chosen_sub)==1
+        if sum(sub==notbiased_sub)==1
             bar(k2, prob_chose_in_favor_opp_second_half(sub),'FaceColor',[0.8500 0.3250 0.0980],'EdgeColor','k','LineWidth',3);
         elseif sum(sub==authors)==1
             bar(k2, prob_chose_in_favor_opp_second_half(sub),'FaceColor',[0.8500 0.3250 0.0980],'EdgeColor',[0.6350 0.0780 0.1840],'LineWidth',3);
@@ -567,7 +573,113 @@ xticks(k+0.5);
 legend(LH6,L6, 'Fontsize',20, 'Box','off');
 
 sgtitle('All subject all analysis w.r.t first half and second half trials','fontsize',30);
+%%
+figure();
+subplot(1,3,1)
+hold on;
+LH(1) = scatter(prob_chose_in_favor_opp_first_half(biased_sub),prob_chose_in_favor_opp_second_half(biased_sub),100,'b','filled');
+hold on;
+errorbar(prob_chose_in_favor_opp_first_half(biased_sub),prob_chose_in_favor_opp_second_half(biased_sub),squeeze(lo_err_opp_first_half(biased_sub)),squeeze(hi_err_opp_first_half(biased_sub)),'horizontal','LineWidth',2, 'LineStyle', 'none','Color','k');
+hold on;
+errorbar(prob_chose_in_favor_opp_first_half(biased_sub),prob_chose_in_favor_opp_second_half(biased_sub),squeeze(lo_err_opp_second_half(biased_sub)),squeeze(hi_err_opp_second_half(biased_sub)),'vertical','LineWidth',2, 'LineStyle', 'none','Color','k');
+hold on;
+LH(2) = scatter(prob_chose_in_favor_opp_first_half(notbiased_sub),prob_chose_in_favor_opp_second_half(notbiased_sub),100,'r','filled');
+hold on;
+errorbar(prob_chose_in_favor_opp_first_half(notbiased_sub),prob_chose_in_favor_opp_second_half(notbiased_sub),squeeze(lo_err_opp_first_half(notbiased_sub)),squeeze(hi_err_opp_first_half(notbiased_sub)),'horizontal','LineWidth',2, 'LineStyle', 'none','Color','k');
+hold on;
+errorbar(prob_chose_in_favor_opp_first_half(notbiased_sub),prob_chose_in_favor_opp_second_half(notbiased_sub),squeeze(lo_err_opp_second_half(notbiased_sub)),squeeze(hi_err_opp_second_half(notbiased_sub)),'vertical','LineWidth',2, 'LineStyle', 'none','Color','k');
+hold on;
+L{1} = 'Biased Subject';
+hold on;
+L{2} = 'Not biased Subject';
+hold on;
+plot(linspace(0.4,1,100),linspace(0.4,1,100),'k','LineWidth',2);
+hold on;
+yline(0.5,'k','Linewidth',2);
+xlabel('Bias in first half of trials','Fontsize',20);
+ylabel('Bias in second half of trials','Fontsize',20);
+ax = gca;
+ax.LineWidth=2;
+set(ax, 'box','off');
+ax.XAxis.FontSize = 20;
+ax.YAxis.FontSize = 20;
+hold on;
+legend(LH,L, 'Fontsize',20, 'Box','off');
 
+
+subplot(1,3,2)
+err1 = sqrt((sub_accuracy_first_half.*(1-sub_accuracy_first_half))./floor(trials_per_num_peri/2));
+err2 = sqrt((sub_accuracy_second_half.*(1-sub_accuracy_second_half))./(trials_per_num_peri -floor(trials_per_num_peri/2)));   
+hold on;
+LH(1) = scatter(sub_accuracy_first_half(biased_sub),sub_accuracy_second_half(biased_sub),100,'b','filled');
+hold on;
+errorbar(sub_accuracy_first_half(biased_sub),sub_accuracy_second_half(biased_sub),squeeze(err1(biased_sub)),'horizontal','LineWidth',2, 'LineStyle', 'none','Color','k');
+hold on;
+errorbar(sub_accuracy_first_half(biased_sub),sub_accuracy_second_half(biased_sub),squeeze(err2(biased_sub)),'vertical','LineWidth',2, 'LineStyle', 'none','Color','k');
+hold on;
+LH(2) = scatter(sub_accuracy_first_half(notbiased_sub),sub_accuracy_second_half(notbiased_sub),100,'r','filled');
+hold on;
+errorbar(sub_accuracy_first_half(notbiased_sub),sub_accuracy_second_half(notbiased_sub),squeeze(err1(notbiased_sub)),'horizontal','LineWidth',2, 'LineStyle', 'none','Color','k');
+hold on;
+errorbar(sub_accuracy_first_half(notbiased_sub),sub_accuracy_second_half(notbiased_sub),squeeze(err2(notbiased_sub)),'vertical','LineWidth',2, 'LineStyle', 'none','Color','k');
+hold on;
+L{1} = 'Biased Subject';
+hold on;
+L{2} = 'Not biased Subject';
+hold on;
+plot(linspace(0.4,1,100),linspace(0.4,1,100),'k','LineWidth',2);
+hold on;
+yline(0.5,'k','Linewidth',2);
+xlabel('Performance in first half of trials','Fontsize',20);
+ylabel('Performance in second half of trials','Fontsize',20);
+ax = gca;
+ax.LineWidth=2;
+set(ax, 'box','off');
+ax.XAxis.FontSize = 20;
+ax.YAxis.FontSize = 20;
+hold on;
+legend(LH,L, 'Fontsize',20, 'Box','off');
+
+
+subplot(1,3,3)
+prob_diff = prob_chose_in_favor_opp_first_half - prob_chose_in_favor_opp_second_half;
+accuracy_diff = sub_accuracy_first_half - sub_accuracy_second_half;
+err_prob_diff = sqrt((hi_err_opp_first_half+lo_err_opp_first_half).^2 + (hi_err_opp_second_half+lo_err_opp_second_half).^2);
+err_accuracy_diff = sqrt(err1.^2+err2.^2);
+LH(1) = scatter(accuracy_diff(biased_sub),prob_diff(biased_sub),100,'b','filled');
+hold on;
+errorbar(accuracy_diff(biased_sub),prob_diff(biased_sub),squeeze(err_accuracy_diff(biased_sub)),'horizontal','LineWidth',2, 'LineStyle', 'none','Color','k');
+hold on;
+errorbar(accuracy_diff(biased_sub),prob_diff(biased_sub),squeeze(err_prob_diff(biased_sub)),'vertical','LineWidth',2, 'LineStyle', 'none','Color','k');
+hold on;
+LH(2) = scatter(accuracy_diff(notbiased_sub),prob_diff(notbiased_sub),100,'r','filled');
+hold on;
+errorbar(accuracy_diff(notbiased_sub),prob_diff(notbiased_sub),squeeze(err_accuracy_diff(notbiased_sub)),'horizontal','LineWidth',2, 'LineStyle', 'none','Color','k');
+hold on;
+errorbar(accuracy_diff(notbiased_sub),prob_diff(notbiased_sub),squeeze(err_prob_diff(notbiased_sub)),'vertical','LineWidth',2, 'LineStyle', 'none','Color','k');
+hold on;
+L{1} = 'Biased Subject';
+hold on;
+L{2} = 'Not biased Subject';
+hold on;
+hold on;
+yline(0.5,'k','Linewidth',2);
+xlabel({'Performance difference';' in first - second half of trials'},'Fontsize',20);
+ylabel('Bias difference in first - second half of trials','Fontsize',20);
+ax = gca;
+ax.LineWidth=2;
+ylim([-0.5,0.5]);
+yline(0.0,'k','LineWidth',2);
+set(ax, 'box','off');
+ax.XAxis.FontSize = 20;
+ax.YAxis.FontSize = 20;
+hold on;
+[r,p] = corrcoef(mean(temporal_kernel(:,5:end),2),squeeze(prob_chose_in_favor_opp{1}));
+text(-0.15,0.25,['corr=' num2str(r(1,2))],'fontsize',15);
+text(-0.15,0.2,['p-val=' num2str(p(1,2))],'fontsize',15);
+legend(LH,L, 'Fontsize',20, 'Box','off');
+
+sgtitle('Analysis of first vs second half of trials','fontsize',30);
 %%
 figure();
 subplot(2,3,1)
@@ -662,7 +774,7 @@ for sub=1:num_sub
         LH6(1) = bar(k1, squeeze(prob_chose_in_favor_opp{1}(sub,:)),'FaceColor',[0.9290 0.6940 0.1250],'EdgeColor','k','LineWidth',0.5);
         L6{1} = 'Bias w.r.t. accumulated belief';
     else
-        if sum(sub==chosen_sub)==1
+        if sum(sub==notbiased_sub)==1
             bar(k1, squeeze(prob_chose_in_favor_opp{1}(sub,:)),'FaceColor',[0.9290 0.6940 0.1250],'EdgeColor','k','LineWidth',3);
         elseif sum(sub==authors)==1
             bar(k1, squeeze(prob_chose_in_favor_opp{1}(sub,:)),'FaceColor',[0.9290 0.6940 0.1250],'EdgeColor',[0.6350 0.0780 0.1840],'LineWidth',3);
@@ -675,7 +787,7 @@ for sub=1:num_sub
         LH6(2) = bar(k2, opp_raw_prob{1}(sub,:),'FaceColor',[0.8500 0.3250 0.0980],'EdgeColor','k','LineWidth',0.5);
         L6{2} = 'Bias w.r.t foveated stimuli only';
     else
-        if sum(sub==chosen_sub)==1
+        if sum(sub==notbiased_sub)==1
             bar(k2, opp_raw_prob{1}(sub,:),'FaceColor',[0.8500 0.3250 0.0980],'EdgeColor','k','LineWidth',3);
         elseif sum(sub==authors)==1
             bar(k2, opp_raw_prob{1}(sub,:),'FaceColor',[0.8500 0.3250 0.0980],'EdgeColor',[0.6350 0.0780 0.1840],'LineWidth',3);
@@ -707,7 +819,7 @@ title('Pattern Matching: Bias w.r.t belief vs foveated stimuli','fontsize',30);
 %%
 figure();
 for i=1:(num_sub)
-    if sum(i==chosen_sub)==1
+    if sum(i==notbiased_sub)==1
         bar(i,squeeze(-pattern_one_previous{i}(4,1) + belief_one_previous{i}(4,1)),'FaceColor',[0.75, 0.75, 0],'EdgeColor','k','LineWidth',3);
         hold on;
     elseif sum(i==authors)==1
@@ -735,7 +847,7 @@ sgtitle('Pattern Matching: Bias w.r.t current belief vs current foveated stimulu
 
 % figure();
 % for i=1:(num_sub)
-%     if sum(i==chosen_sub)==1
+%     if sum(i==notbiased_sub)==1
 %         bar(i,squeeze(-pattern_one_previous_case_belief_evi_opp{i}(4,1) + belief_one_previous_case_belief_evi_opp{i}(4,1)),'FaceColor',[0.75, 0.75, 0],'EdgeColor','k','LineWidth',3);
 %         hold on;
 %     elseif sum(i==authors)==1
@@ -763,7 +875,7 @@ sgtitle('Pattern Matching: Bias w.r.t current belief vs current foveated stimulu
 
 figure();
 for i=1:(num_sub)
-    if (i==chosen_sub)==1
+    if (i==notbiased_sub)==1
         bar(i,squeeze(-opp_raw_prob{1}(i,:)) + squeeze(prob_chose_in_favor_opp{1}(i,:)),'FaceColor',[0.75, 0.75, 0],'EdgeColor','k','LineWidth',3);
         hold on;
     elseif sum(i==authors)==1
@@ -860,11 +972,11 @@ errorbar(mean(temporal_kernel(:,8:9),2),squeeze(prob_chose_in_favor_opp{1}),sque
 hold on;
 errorbar(mean(temporal_kernel(:,8:9),2),squeeze(prob_chose_in_favor_opp{1}),squeeze(std(temporal_kernel(:,8:9)'))/sqrt(2),'horizontal','LineWidth',2, 'LineStyle', 'none','Color','k');
 hold on;
-LH(2) = scatter(mean(temporal_kernel(chosen_sub,8:9),2),squeeze(prob_chose_in_favor_opp{1}(chosen_sub)),100,'r','filled');
+LH(2) = scatter(mean(temporal_kernel(notbiased_sub,8:9),2),squeeze(prob_chose_in_favor_opp{1}(notbiased_sub)),100,'r','filled');
 hold on;
-errorbar(mean(temporal_kernel(chosen_sub,8:9),2),squeeze(prob_chose_in_favor_opp{1}(chosen_sub)),squeeze(lo_err_opp{1}(chosen_sub)),squeeze(hi_err_opp{1}(chosen_sub)),'vertical','LineWidth',2, 'LineStyle', 'none','Color','k');
+errorbar(mean(temporal_kernel(notbiased_sub,8:9),2),squeeze(prob_chose_in_favor_opp{1}(notbiased_sub)),squeeze(lo_err_opp{1}(notbiased_sub)),squeeze(hi_err_opp{1}(notbiased_sub)),'vertical','LineWidth',2, 'LineStyle', 'none','Color','k');
 hold on;
-errorbar(mean(temporal_kernel(chosen_sub,8:9),2),squeeze(prob_chose_in_favor_opp{1}(chosen_sub)),squeeze(std(temporal_kernel(chosen_sub,8:9)'))/sqrt(2),'horizontal','LineWidth',2, 'LineStyle', 'none','Color','k');
+errorbar(mean(temporal_kernel(notbiased_sub,8:9),2),squeeze(prob_chose_in_favor_opp{1}(notbiased_sub)),squeeze(std(temporal_kernel(notbiased_sub,8:9)'))/sqrt(2),'horizontal','LineWidth',2, 'LineStyle', 'none','Color','k');
 hold on;
 L{1} = 'Biased Subject';
 hold on;
@@ -894,11 +1006,11 @@ errorbar(mean(temporal_kernel(:,5:end),2),squeeze(prob_chose_in_favor_opp{1}),sq
 hold on;
 errorbar(mean(temporal_kernel(:,5:end),2),squeeze(prob_chose_in_favor_opp{1}),squeeze(std(temporal_kernel(:,5:end)'))/sqrt(5),'horizontal','LineWidth',2, 'LineStyle', 'none','Color','k');
 hold on;
-LH(2) = scatter(mean(temporal_kernel(chosen_sub,5:end),2),squeeze(prob_chose_in_favor_opp{1}(chosen_sub)),100,'r','filled');
+LH(2) = scatter(mean(temporal_kernel(notbiased_sub,5:end),2),squeeze(prob_chose_in_favor_opp{1}(notbiased_sub)),100,'r','filled');
 hold on;
-errorbar(mean(temporal_kernel(chosen_sub,5:end),2),squeeze(prob_chose_in_favor_opp{1}(chosen_sub)),squeeze(lo_err_opp{1}(chosen_sub)),squeeze(hi_err_opp{1}(chosen_sub)),'vertical','LineWidth',2, 'LineStyle', 'none','Color','k');
+errorbar(mean(temporal_kernel(notbiased_sub,5:end),2),squeeze(prob_chose_in_favor_opp{1}(notbiased_sub)),squeeze(lo_err_opp{1}(notbiased_sub)),squeeze(hi_err_opp{1}(notbiased_sub)),'vertical','LineWidth',2, 'LineStyle', 'none','Color','k');
 hold on;
-errorbar(mean(temporal_kernel(chosen_sub,5:end),2),squeeze(prob_chose_in_favor_opp{1}(chosen_sub)),squeeze(std(temporal_kernel(chosen_sub,5:end)'))/sqrt(5),'horizontal','LineWidth',2, 'LineStyle', 'none','Color','k');
+errorbar(mean(temporal_kernel(notbiased_sub,5:end),2),squeeze(prob_chose_in_favor_opp{1}(notbiased_sub)),squeeze(std(temporal_kernel(notbiased_sub,5:end)'))/sqrt(5),'horizontal','LineWidth',2, 'LineStyle', 'none','Color','k');
 hold on;
 L{1} = 'Biased Subject';
 hold on;
@@ -918,17 +1030,17 @@ ax.YAxis.FontSize = 20;
 hold on;
 legend(LH,L, 'Fontsize',20, 'Box','off');
 %%
-chosen_sub = [];
+notbiased_sub = [];
 for i=1:num_sub
     if stars{i}==' '
-        chosen_sub(end+1) = i;
+        notbiased_sub(end+1) = i;
     end
 end
-if ~isempty(chosen_sub)
+if ~isempty(notbiased_sub)
     figure();
     subplot(2,3,1)
     hold on;
-    bar(1:length(chosen_sub),sub_accuracy(chosen_sub)./trials_per_num_peri(chosen_sub), 'FaceColor',[0.9290 0.6940 0.1250],'EdgeColor','k','LineWidth',0.75);
+    bar(1:length(notbiased_sub),sub_accuracy(notbiased_sub)./trials_per_num_peri(notbiased_sub), 'FaceColor',[0.9290 0.6940 0.1250],'EdgeColor','k','LineWidth',0.75);
     hold on;
     yline(0.5,'k','LineWidth',1.5);
     xlabel('Subject Number','Fontsize',20);
@@ -936,21 +1048,21 @@ if ~isempty(chosen_sub)
     ax = gca;
     ax.LineWidth=2;
     ylim([0.4 1]);
-    xlim([0.5 length(chosen_sub)+0.5]);
+    xlim([0.5 length(notbiased_sub)+0.5]);
     ax.YAxis.FontSize = 20;
     ax.XAxis.FontSize = 20;
-    xticks(linspace(1, length(chosen_sub),length(chosen_sub)));
-    xticklabels(chosen_sub);
+    xticks(linspace(1, length(notbiased_sub),length(notbiased_sub)));
+    xticklabels(notbiased_sub);
     hold on;
-    tmp = sub_accuracy(chosen_sub)./(trials_per_num_peri(chosen_sub));
-    errorbar(1:length(chosen_sub),tmp,tmp.*(1-tmp)./2,'ok','LineWidth', 1.5);
+    tmp = sub_accuracy(notbiased_sub)./(trials_per_num_peri(notbiased_sub));
+    errorbar(1:length(notbiased_sub),tmp,tmp.*(1-tmp)./2,'ok','LineWidth', 1.5);
     hold on;
     
     subplot(2,3,2)
     hold on;
-    bar(1:length(chosen_sub),squeeze(squeeze(prob_chose_in_favor_opp{1}(chosen_sub,:))), 'FaceColor',[0.9290 0.6940 0.1250],'EdgeColor','k','LineWidth',0.75);
+    bar(1:length(notbiased_sub),squeeze(squeeze(prob_chose_in_favor_opp{1}(notbiased_sub,:))), 'FaceColor',[0.9290 0.6940 0.1250],'EdgeColor','k','LineWidth',0.75);
     hold on;
-    errorbar(1:length(chosen_sub),squeeze(squeeze(prob_chose_in_favor_opp{1}(chosen_sub,:))),squeeze(lo_err_opp{1}(chosen_sub,:)),squeeze(hi_err_opp{1}(chosen_sub,:)),'ok','LineWidth', 1.5);
+    errorbar(1:length(notbiased_sub),squeeze(squeeze(prob_chose_in_favor_opp{1}(notbiased_sub,:))),squeeze(lo_err_opp{1}(notbiased_sub,:)),squeeze(hi_err_opp{1}(notbiased_sub,:)),'ok','LineWidth', 1.5);
     hold on;
     xlabel('Subject Number','Fontsize',20);
     ylabel({'Probability of saccading to ';'evidence confirming current belief'},'Fontsize',20);
@@ -958,16 +1070,16 @@ if ~isempty(chosen_sub)
     ax = gca;
     ax.LineWidth=2;
     ylim([0.4 1]);
-    xticks(linspace(1, length(chosen_sub),length(chosen_sub)));
-    xticklabels(chosen_sub);
-    xlim([0.5 length(chosen_sub)+0.5]);
+    xticks(linspace(1, length(notbiased_sub),length(notbiased_sub)));
+    xticklabels(notbiased_sub);
+    xlim([0.5 length(notbiased_sub)+0.5]);
     ax.XAxis.FontSize = 20;
     ax.YAxis.FontSize = 20;
     hold on;
     
     subplot(2,3,3)
-    for i=1:length(chosen_sub)
-        plot(1:frames,squeeze(temporal_kernel(chosen_sub(i),1:frames)),'k','linewidth',2);
+    for i=1:length(notbiased_sub)
+        plot(1:frames,squeeze(temporal_kernel(notbiased_sub(i),1:frames)),'k','linewidth',2);
         hold on;
     end
     % ylim([-0.05 0.05]);
@@ -982,10 +1094,10 @@ if ~isempty(chosen_sub)
     ax.XAxis.FontSize = 20;
     ax.YAxis.FontSize = 20;
     hold on;
-    for i=1:length(chosen_sub)
-        scatter((2:frames),squeeze(temporal_kernel(chosen_sub(i),(frames+1):(end - pr ))),'om','filled');
+    for i=1:length(notbiased_sub)
+        scatter((2:frames),squeeze(temporal_kernel(notbiased_sub(i),(frames+1):(end - pr ))),'om','filled');
         hold on;
-        scatter([frames+1 frames+1]',squeeze(temporal_kernel(chosen_sub(i),(end - pr+1 ):end)),'om','filled');
+        scatter([frames+1 frames+1]',squeeze(temporal_kernel(notbiased_sub(i),(end - pr+1 ):end)),'om','filled');
     end
     xlim([1 5]);
     
@@ -1280,3 +1392,11 @@ sgtitle(['Green: Ideal all frames Red: Ideal fovea only Blue: Subject'], 'fontsi
 %     title(['Subject ' num2str(i)],'fontsize',20);
 % end
 % sgtitle('Two previous difference between belief and pattern matching','fontsize',30);
+
+
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+close all;
+filename_save = strcat('SavedWorkspace/GazeContingentExternalCB_',date,'.mat');
+save(filename_save);
