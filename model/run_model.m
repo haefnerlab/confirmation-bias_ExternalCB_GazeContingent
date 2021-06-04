@@ -5,8 +5,8 @@ scale_normalize=120;
 orientation_std_exp=0.11;
 
 
-a=[1:10,25:25:100];
-b=logspace(-1,log10(5),6);
+a=[100];
+b=[0.6];
 % c=[1];
 %
 for i1=1:numel(a)
@@ -30,7 +30,7 @@ for i1=1:numel(a)
         num_peri = 2;
         frames = 4;
         num_images = num_peri * frames +1;
-        num_trials=1000;
+        num_trials=300;
         
         
         category_trial=sign(binornd(1,0.5,num_trials,1)-0.5);
@@ -44,11 +44,11 @@ for i1=1:numel(a)
         
         
         
-        [chosen_locs,not_chosen_locs,final_choice,lo]=simulate_model(frame_signals,params,scale_normalize,is_sampling,orientation_std_exp);
+        [chosen_locs,not_chosen_locs,final_choice,lo]=simulate_model_v4(frame_signals,params,scale_normalize,is_sampling,orientation_std_exp);
         
         
         %%
-        num_reps=5;
+        num_reps=1;
         nn=1;
         
         hpr1 = logspace(-1, 5, 7);
@@ -73,7 +73,13 @@ for i1=1:numel(a)
         
         %                         [best_hprs, ~] = xValidatePK_with_lapse(frame_signals_ord, final_choice(:)'==1, frames, hpr1, 0, hpr2, 0, 10);
         %                         [sig_wts, ~, ~, ~, ~, ~] = PsychophysicalKernelwithlapse(frame_signals_ord, final_choice==1, frames, best_hprs(1), 0, best_hprs(3), 0);
-        [sig_wts, ~, ~, ~, ~, ~] = PsychophysicalKernelwithlapse(frame_signals_ord, final_choice(:)'==1, frames, 0, 0, 0, 0);
+        
+        
+%         [sig_wts, ~, ~, ~, ~, ~] = PsychophysicalKernelwithlapse(frame_signals_ord, final_choice(:)'==1, frames, 0, 0, 0, 0);
+        [sig_wts, ~, ~, ~, ~, ~] = PsychophysicalKernelwithlapse(frame_signals_ord, final_choice(:)'==1, frames, 0.2955, 0, 0.4437, 0);
+        
+        
+        
         % [sig_wts, ~, ~, ~, ~, ~] = PsychophysicalKernelwithlapse(frame_signals_ord, final_choice(:)'==1, frames, 0.29552, 0, 0.001, 0);
         weighted_signal_all = (sig_wts(1:all_frames))'.* frame_signals_ord;
         weighted_signal_chosen = weighted_signal_all(:,1:frames);
@@ -90,10 +96,11 @@ for i1=1:numel(a)
         sgn_signal_notchosen = sign(frame_signals_ord(:,frames+1:(end-num_peri)));
         all_sigs=[sgn_signal_chosen(:),sgn_signal_notchosen(:)];
         accumulated_belief=accumulated_belief(:);
+        lo=lo(:);
         ids_del=prod(all_sigs,2)==1;
         all_sigs(ids_del,:)=[];
         accumulated_belief(ids_del)=[];
-        
+        lo(ids_del)=[];
         chosen_signal_sign=all_sigs(:,1);
         if frames>1
             prop_confirmatory_saccade(nn)=mean(chosen_signal_sign==sign(accumulated_belief));
