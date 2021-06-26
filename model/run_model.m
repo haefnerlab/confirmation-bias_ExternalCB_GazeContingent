@@ -3,15 +3,15 @@
 scale_normalize=120;
 
 orientation_std_exp=0.11;
+rng('default')
 
-
-a=[100];
-b=[0.6];
+a=[Inf];
+b=[0.5];
 % c=[1];
 %
 for i1=1:numel(a)
     for i2=1:numel(b)
-        clc
+%         clc
         i1
         i2
         
@@ -23,17 +23,18 @@ for i1=1:numel(a)
         p_match=0.7;
         
         is_sampling=[1,1];
-        params=[100,a(i1),0.1,b(i2),p_match,0,0.5,0,0.5];
+        params=[Inf,a(i1),0.1,b(i2),p_match,0,0.5,0,0.5];
         
         %%
         
         num_peri = 2;
         frames = 4;
         num_images = num_peri * frames +1;
-        num_trials=300;
+        num_trials=1e4;
         
         
-        category_trial=sign(binornd(1,0.5,num_trials,1)-0.5);
+%         category_trial=sign(binornd(1,0.5,num_trials,1)-0.5);
+        category_trial=sign(rand(num_trials,1)-0.5);
         frame_categories=repmat(category_trial,1,num_images).*sign(binornd(1,p_match,num_trials,num_images)-0.5);
         frame_signals=frame_categories+normrnd(0,orientation_std_exp,size(frame_categories));
         frame_signals=frame_signals*scale_normalize;
@@ -44,7 +45,7 @@ for i1=1:numel(a)
         
         
         
-        [chosen_locs,not_chosen_locs,final_choice,lo]=simulate_model_v4(frame_signals,params,scale_normalize,is_sampling,orientation_std_exp);
+        [chosen_locs,not_chosen_locs,final_choice,lo]=simulate_model_v5(frame_signals,params,scale_normalize,is_sampling,orientation_std_exp);
         
         
         %%
@@ -124,8 +125,8 @@ for i1=1:numel(a)
             
             
             
+             [chosen_locs,not_chosen_locs,final_choice,lo]=simulate_model_v4(frame_signals,params,scale_normalize,is_sampling,orientation_std_exp);
             
-            [chosen_locs,not_chosen_locs,final_choice,lo]=simulate_model(frame_signals,params,scale_normalize,is_sampling,orientation_std_exp);
             
             
             
@@ -170,6 +171,7 @@ for i1=1:numel(a)
                 prop_confirmatory_saccade(nn)=mean(chosen_signal_sign==sign(accumulated_belief));
             end
             accuracy(nn)=mean(final_choice==category_trial);
+            
             wts_agg(:,nn)=sig_wts(1:end);
             
             

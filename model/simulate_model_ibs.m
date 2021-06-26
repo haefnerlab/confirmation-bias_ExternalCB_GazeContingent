@@ -8,7 +8,7 @@ orientation_std_exp=0.11;
 p_match=0.7;
 
 is_sampling=[1,1];
-params=[100,theta(1),theta(2),theta(3),p_match,0,0.5,0,0.5];
+params=[Inf,Inf,0.1,theta,p_match,0,0.5,0,0.5];
 
 
 %%
@@ -20,7 +20,7 @@ frame_signals=frame_signals*scale_normalize;
 
 
 
-[chosen_locs,not_chosen_locs,final_choice,lo]=simulate_model_v4(frame_signals,params,scale_normalize,is_sampling,orientation_std_exp);
+[chosen_locs,not_chosen_locs,final_choice,lo]=simulate_model_v5(frame_signals,params,scale_normalize,is_sampling,orientation_std_exp);
 
 resp=bin2dec(num2str([chosen_locs==1,final_choice==1]));
 

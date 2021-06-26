@@ -11,8 +11,8 @@ for i=1:size(dmat,1)
         resps(i,:)=tmp1(id,:);
     end
 end
-% for i=1:nsamp
-% resps(:,i)=simulate_model_ibs(theta,dmat);
+% parfor i=1:nsamp
+%     resps(:,i)=simulate_model_ibs(theta,dmat);
 % end
 
 ll=0;
