@@ -4,7 +4,7 @@ tmp1=ones(2.^size(dmat,2),nsamp);
 for i=1:size(dmat,1)
     id=1+bin2dec(num2str(0.5*(1+dmat(i,:))));
     if tmp(id)==99
-        resps(i,:)=simulate_model_ibs(theta,repmat(dmat(i,:),nsamp,1))';
+        resps(i,:)=simulate_model_ibs_v2(theta,repmat(dmat(i,:),nsamp,1))';
         tmp(id)=1;
         tmp1(id,:)=resps(i,:);
     else

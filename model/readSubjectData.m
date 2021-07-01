@@ -1,7 +1,7 @@
 function data_sub = readSubjectData(subjectID)
 expt_type = 3;
 [ParentFolderPath] = fileparts(pwd);
-datadir = fullfile(ParentFolderPath, '../../../../RawData');
+datadir = fullfile(ParentFolderPath, '../../../RawData');
 
 signal_chosen_raw_actual = [];
 signal_not_chosen_raw_actual = [];
@@ -42,6 +42,7 @@ data_sub.frame_categories = signal_all;
 data_sub.choice = choice_raw;
 data_sub.num_trials = trials;
 data_sub.accuracy = accuracy; 
+
 disp('Data for the subject loaded!');
 
 end

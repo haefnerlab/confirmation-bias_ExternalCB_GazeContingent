@@ -1,17 +1,17 @@
 % load('synthetic_data.mat')
-
+load('sig_2_bfit_subs.mat')
 scale_normalize=120;
 
 orientation_std_exp=0.11;
 rng('default')
 
-a=[Inf];
-b=[0.5];
+a=[1:25,50,75,100];
+b=[sqrt(sig_2s_subs)];
 % c=[1];
 %
 for i1=1:numel(a)
     for i2=1:numel(b)
-%         clc
+        clc
         i1
         i2
         
@@ -49,7 +49,7 @@ for i1=1:numel(a)
         
         
         %%
-        num_reps=1;
+        num_reps=13;
         nn=1;
         
         hpr1 = logspace(-1, 5, 7);
@@ -125,7 +125,7 @@ for i1=1:numel(a)
             
             
             
-             [chosen_locs,not_chosen_locs,final_choice,lo]=simulate_model_v4(frame_signals,params,scale_normalize,is_sampling,orientation_std_exp);
+             [chosen_locs,not_chosen_locs,final_choice,lo]=simulate_model_v5(frame_signals,params,scale_normalize,is_sampling,orientation_std_exp);
             
             
             
