@@ -12,7 +12,7 @@ subjects = ...
 
 
 
-for kk=1:numel(subjects)
+for kk=[1,2,3,8,9,10,12,13,15,16]
 kk
 data_sub = readSubjectData(subjects{kk});
 dmat1=data_sub.frame_categories;
