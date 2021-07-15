@@ -42,14 +42,21 @@ log_odds_accumulated(:,1) = logodds_model(I_first,sigma_fovea.^2,p_match);
 
 c1=zeros(num_trials,num_frames-1);
 nc1=zeros(num_trials,num_frames-1);
+gamma=(sigma_peri.^2)./((sigma_peri.^2)+(sigma_fovea.^2));
 for i=1:num_frames-1
     
     sd1=randi(1e8);
     
     b1= compute_bas_v3(I_peri(:,2*i-1),sigmoid(-1*log_odds_accumulated(:,i)),p_match,sigma_peri^2,[num_samples_total_entropy,num_samples_noise_entropy],sd1);
     b2= compute_bas_v3(I_peri(:,2*i),sigmoid(-1*log_odds_accumulated(:,i)),p_match,sigma_peri^2,[num_samples_total_entropy,num_samples_noise_entropy],sd1);
-    log_odds_l1=logodds_model(I_others(:,2*i-1),sigma_fovea.^2,p_match);
-    log_odds_l2=logodds_model(I_others(:,2*i),sigma_fovea.^2,p_match);
+%     log_odds_l1=logodds_model(I_others(:,2*i-1),sigma_fovea.^2,p_match);
+%     log_odds_l2=logodds_model(I_others(:,2*i),sigma_fovea.^2,p_match);
+
+    log_odds_l1=logodds_model(I_others(:,2*i-1)*gamma+I_peri(:,2*i-1)*(1-gamma),(sigma_fovea.^2)*gamma,p_match);
+    log_odds_l2=logodds_model(I_others(:,2*i)*gamma+I_peri(:,2*i)*(1-gamma),(sigma_fovea.^2)*gamma,p_match);
+
+
+
     log_odds_l1_peri=logodds_model(I_peri(:,2*i-1),sigma_peri.^2,p_match);
     log_odds_l2_peri=logodds_model(I_peri(:,2*i),sigma_peri.^2,p_match);
     
@@ -61,22 +68,22 @@ for i=1:num_frames-1
     
     c1(b1>b2,i)=1;
     nc1(b1>b2,i)=2;
-    log_odds_accumulated(b1>b2,i+1) = log_odds_accumulated(b1>b2,i) + log_odds_l1(b1>b2) + log_odds_l2_peri(b1>b2) + log_odds_l1_peri(b1>b2);
+    log_odds_accumulated(b1>b2,i+1) = log_odds_accumulated(b1>b2,i) + log_odds_l1(b1>b2) + log_odds_l2_peri(b1>b2);
     
     c1(b1<b2,i)=2;
     nc1(b1<b2,i)=1;
-    log_odds_accumulated(b1<b2,i+1) = log_odds_accumulated(b1<b2,i) + log_odds_l2(b1<b2) + log_odds_l2_peri(b1<b2) + log_odds_l1_peri(b1<b2);
+    log_odds_accumulated(b1<b2,i+1) = log_odds_accumulated(b1<b2,i) + log_odds_l2(b1<b2) + log_odds_l2_peri(b1<b2);
     
     r1=rand(num_trials,1)<0.5;
     
     c1(r1==0& (b1==b2),i)=1;
     nc1(r1==0& (b1==b2),i)=2;
-    log_odds_accumulated(r1==0 & (b1==b2),i+1) = log_odds_accumulated(r1==0& (b1==b2),i) + log_odds_l1(r1==0& (b1==b2)) + log_odds_l2_peri(r1==0& (b1==b2)) + log_odds_l1_peri(r1==0& (b1==b2));
+    log_odds_accumulated(r1==0 & (b1==b2),i+1) = log_odds_accumulated(r1==0& (b1==b2),i) + log_odds_l1(r1==0& (b1==b2)) + log_odds_l2_peri(r1==0& (b1==b2));
     
     
     c1(r1==1& (b1==b2),i)=2;
     nc1(r1==1& (b1==b2),i)=1;
-    log_odds_accumulated(r1==1& (b1==b2),i+1) = log_odds_accumulated(r1==1& (b1==b2),i) + log_odds_l2(r1==1& (b1==b2)) + log_odds_l2_peri(r1==1& (b1==b2)) + log_odds_l1_peri(r1==1& (b1==b2));
+    log_odds_accumulated(r1==1& (b1==b2),i+1) = log_odds_accumulated(r1==1& (b1==b2),i) + log_odds_l2(r1==1& (b1==b2)) + log_odds_l1_peri(r1==1& (b1==b2));
     
     
     

@@ -5,8 +5,8 @@ scale_normalize=120;
 orientation_std_exp=0.11;
 rng('default')
 
-a=[1:25,50,76,100];
-b=[3.02];
+a=[Inf];
+b=[3];
 % c=[1];
 %
 for i1=1:numel(a)
