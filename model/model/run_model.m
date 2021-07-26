@@ -5,8 +5,8 @@ scale_normalize=120;
 orientation_std_exp=0.11;
 rng('default')
 
-a=[Inf];
-b=[3];
+a=[1:25,50,75,100];
+b=[sqrt(sig_2s_subs)];
 % c=[1];
 %
 for i1=1:numel(a)

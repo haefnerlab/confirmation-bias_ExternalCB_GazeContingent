@@ -1,7 +1,7 @@
 load('synthetic_data.mat')
 params=[100,1,0.1,0.3,0.7,0,0.5,0,0.5];
 
-[chosen_locs,not_chosen_locs,final_choice]=simulate_model(frame_signals,params,scale_normalize,is_sampling,0);
+[chosen_locs,not_chosen_locs,final_choice]=simulate_model_v4(frame_signals,params,scale_normalize,is_sampling,0);
 
 %%
 % load('tmp');

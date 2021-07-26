@@ -1,7 +1,6 @@
 function [chosen_locs,not_chosen_locs,final_choice,log_odds_accumulated]=simulate_model(frame_signals,params,scale_normalize,is_sampling,orientation_std_exp)
 
 frame_signals=frame_signals/scale_normalize;
-% orientation_std_exp=0.11;
 
 
 
@@ -15,12 +14,9 @@ num_samples_noise_entropy=params(2);
 
 sigma_fovea = sqrt(orientation_std_exp.^2+params(3).^2);
 sigma_fovea0 = params(3);
-% sigma_fovea0 = sigma_fovea;
-
 
 sigma_peri = sqrt(orientation_std_exp.^2+params(4).^2);
 sigma_peri0 = params(4);
-% sigma_peri0=sigma_peri;
 
 p_match = params(5);
 lapse_rate_choice=params(6);
@@ -65,12 +61,7 @@ for tr=1:num_trials
     I_others(tr,:,:) = normrnd([frame_signals(tr,2:2:end);frame_signals(tr,3:2:end)], sigma_fovea0);
     I_peri(tr,:,:) = normrnd([frame_signals(tr,2:2:end);frame_signals(tr,3:2:end)], sigma_peri0);
     
-    %     log_odds_accumulated(tr,1) = log(normpdf(I_first(tr),-1,sigma_fovea)*p_match + normpdf(I_first(tr),1,sigma_fovea)*(1-p_match)) ...
-    %         - log(normpdf(I_first(tr),1,sigma_fovea)*p_match + normpdf(I_first(tr),-1,sigma_fovea)*(1-p_match));
     
-    
-%     log_odds_accumulated(tr,1) = logsumexp([lognormpdf(I_first(tr),-1,sigma_fovea)+log(p_match),lognormpdf(I_first(tr),1,sigma_fovea)+log(1-p_match)],2) ...
-%         - logsumexp([lognormpdf(I_first(tr),1,sigma_fovea)+log(p_match),lognormpdf(I_first(tr),-1,sigma_fovea)+log(1-p_match)],2);
     log_odds_accumulated(tr,1) = logodds_model(I_first(tr),sigma_fovea.^2,p_match);
     
     
@@ -88,16 +79,6 @@ for tr=1:num_trials
         [BAS(tr,i,2),comp1(tr,i,2),comp2(tr,i,2)] = compute_score(squeeze(table_ct_cl1_cl2_given_d(tr,:,:,:)),l2_dim,num_samples_total_entropy,num_samples_noise_entropy,is_sampling,sd1);
         
         
-        
-        
-%         log_odds_l1 = logsumexp([lognormpdf(I_others(tr,1,i),-1,sigma_fovea)+log(p_match),lognormpdf(I_others(tr,1,i),1,sigma_fovea)+log(1-p_match)],2) ...
-%             - logsumexp([lognormpdf(I_others(tr,1,i),1,sigma_fovea)+log(p_match),lognormpdf(I_others(tr,1,i),-1,sigma_fovea)+log(1-p_match)],2);
-%         log_odds_l2 = logsumexp([lognormpdf(I_others(tr,2,i),-1,sigma_fovea)+log(p_match),lognormpdf(I_others(tr,2,i),1,sigma_fovea)+log(1-p_match)],2) ...
-%             - logsumexp([lognormpdf(I_others(tr,2,i),1,sigma_fovea)+log(p_match),lognormpdf(I_others(tr,2,i),-1,sigma_fovea)+log(1-p_match)],2);
-%         log_odds_l1_peri = logsumexp([lognormpdf(I_peri(tr,1,i),-1,sigma_peri)+log(p_match),lognormpdf(I_peri(tr,1,i),1,sigma_peri)+log(1-p_match)],2) ...
-%             - logsumexp([lognormpdf(I_peri(tr,1,i),1,sigma_peri)+log(p_match),lognormpdf(I_peri(tr,1,i),-1,sigma_peri)+log(1-p_match)],2);
-%         log_odds_l2_peri = logsumexp([lognormpdf(I_peri(tr,2,i),-1,sigma_peri)+log(p_match),lognormpdf(I_peri(tr,2,i),1,sigma_peri)+log(1-p_match)],2) ...
-%             - logsumexp([lognormpdf(I_peri(tr,2,i),1,sigma_peri)+log(p_match),lognormpdf(I_peri(tr,2,i),-1,sigma_peri)+log(1-p_match)],2);
         
         log_odds_l1=logodds_model(I_others(tr,1,i),sigma_fovea.^2,p_match);
         log_odds_l2=logodds_model(I_others(tr,2,i),sigma_fovea.^2,p_match);
@@ -135,15 +116,10 @@ for tr=1:num_trials
         
     end
     
-    
-%     log_odds_l1_peri = logsumexp([lognormpdf(I_peri(tr,1,end),-1,sigma_peri)+log(p_match),lognormpdf(I_peri(tr,1,end),1,sigma_peri)+log(1-p_match)],2) ...
-%         - logsumexp([lognormpdf(I_peri(tr,1,end),1,sigma_peri)+log(p_match),lognormpdf(I_peri(tr,1,end),-1,sigma_peri)+log(1-p_match)],2);
-%     log_odds_l2_peri = logsumexp([lognormpdf(I_peri(tr,2,end),-1,sigma_peri)+log(p_match),lognormpdf(I_peri(tr,2,end),1,sigma_peri)+log(1-p_match)],2) ...
-%         - logsumexp([lognormpdf(I_peri(tr,2,end),1,sigma_peri)+log(p_match),lognormpdf(I_peri(tr,2,end),-1,sigma_peri)+log(1-p_match)],2);
-    
+
     
     log_odds_l1_peri=logodds_model(I_peri(tr,1,end),sigma_peri.^2,p_match);
-        log_odds_l2_peri=logodds_model(I_peri(tr,2,end),sigma_peri.^2,p_match);
+    log_odds_l2_peri=logodds_model(I_peri(tr,2,end),sigma_peri.^2,p_match);
     
     if isempty(i)
         i=0;
