@@ -10,8 +10,8 @@ subjects = ...
     'GCV3-subject22'; 'GCV3-subject23';...
     };
 
-load('likelihood_4d_full');
-nsamps=[1:2:100];
+load('likelihoods_new.mat');
+nsamps=[1,2,3,5,10,Inf];
 sigs=logspace(-1,2,51);
 
 
@@ -25,7 +25,7 @@ for kk=1:16
     %%
     
     
-    ll_sig_ncog=get_like_sig_ncog(dmat,resp,lls1);
+    ll_sig_ncog=get_like_sig_ncog(dmat,resp,lls);
     ll1=ll_sig_ncog-logsumexp(ll_sig_ncog(:),1);
     ll1=exp(ll1);
     
@@ -34,8 +34,9 @@ for kk=1:16
     subplot(4,4,kk);
     %     plot(ns,ll_cog,'o-','linewidth',2)
     
-    plot(nsamps,sum(ll1,2),'color',[1,0,0],'linewidth',2);
-    
+    plot(sum(ll1,2),'color',[1,0,0],'linewidth',2);
+    xticks([1:6]);
+    xticklabels([1,2,3,5,10,Inf])
     xlabel('num. of samples');
         ylabel('posterior probability');
         set(gca,'TickDir','out');

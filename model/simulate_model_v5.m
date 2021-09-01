@@ -72,7 +72,7 @@ for i=1:num_frames-1
     
     c1(b1<b2,i)=2;
     nc1(b1<b2,i)=1;
-    log_odds_accumulated(b1<b2,i+1) = log_odds_accumulated(b1<b2,i) + log_odds_l2(b1<b2) + log_odds_l2_peri(b1<b2);
+    log_odds_accumulated(b1<b2,i+1) = log_odds_accumulated(b1<b2,i) + log_odds_l2(b1<b2) + log_odds_l1_peri(b1<b2);
     
     r1=rand(num_trials,1)<0.5;
     

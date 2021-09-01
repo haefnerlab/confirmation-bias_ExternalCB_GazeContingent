@@ -1,7 +1,7 @@
-load('likelihood_4d_full');
+load('likelihoods_new.mat');
 
 sigs_true=[10^(0),10^(0.5),10^(1)];
-nsamps_true=[1,5,20];
+nsamps_true=[1,5,50];
 
 nsamps=[1:2:100];
 sigs=logspace(-1,2,51);
@@ -16,7 +16,7 @@ for i=1:numel(sigs_true)
             category_trial=sign(rand(num_trials,1)-0.5);
             dmat=category_trial.*sign(binornd(1,0.7,num_trials,9)-0.5);
             resp=simulate_model_ibs_v3([nsamps_true(j),sigs_true(i)],dmat);
-            ll_sig_ncog=get_like_sig_ncog(dmat,resp,lls1);
+            ll_sig_ncog=get_like_sig_ncog(dmat,resp,lls);
             ll1=ll_sig_ncog-logsumexp(ll_sig_ncog(:),1);
             ll1=exp(ll1);
             subplot(3,3,3*(i-1)+j);
@@ -73,7 +73,7 @@ for i=1:numel(sigs_true)
         category_trial=sign(rand(num_trials,1)-0.5);
         dmat=category_trial.*sign(binornd(1,0.7,num_trials,9)-0.5);
         resp=simulate_model_ibs_v3([nsamps_true(j),sigs_true(i)],dmat);
-        ll_sig_ncog=get_like_sig_ncog(dmat,resp,lls1);
+        ll_sig_ncog=get_like_sig_ncog(dmat,resp,lls);
         ll1=ll_sig_ncog-logsumexp(ll_sig_ncog(:),1);
         ll1=exp(ll1);
         subplot(3,3,3*(i-1)+j);

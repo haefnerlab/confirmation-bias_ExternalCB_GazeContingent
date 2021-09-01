@@ -1,12 +1,12 @@
 %%
-num_reps=3;
+num_reps=5;
 
 
 sig_2=@(alp,sige_2) (1./(norminv(alp).^2))-sige_2;
 
 alps=linspace(0.5,1,11);
 alps([1,end])=[0.51,0.99];
-alps=0.8;
+alps=0.75;
 num_sacs=[0:15];
 
 for q4=1:numel(num_sacs)

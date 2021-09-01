@@ -16,7 +16,7 @@ sigs=logspace(-1,2,51);
 
 
 %%
-for kk=1:1%16
+for kk=1:16
     kk
     data_sub = readSubjectData(subjects{kk});
     dmat1=data_sub.frame_categories;
@@ -25,7 +25,7 @@ for kk=1:1%16
     %%
     
     
-    ll_sig_ncog=get_like_sig_ncog(dmat,resp,lls1);
+    ll_sig_ncog=get_like_sig_ncog(dmat,resp,lls);
     ll1=ll_sig_ncog-logsumexp(ll_sig_ncog(:),1);
     ll1=exp(ll1);
     
